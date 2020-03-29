@@ -2,11 +2,10 @@
 
 The best way to reproduce this is to do the following:
 
-1. Clone the repository. Change into the `app` directory.
+1. Clone the repository.
 
 ```
-$ git checkout <branch>
-$ cd app
+$ git clone https://github.com/betfund/betfund-webapp.git
 ```
 
 
