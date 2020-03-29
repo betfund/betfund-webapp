@@ -33,9 +33,7 @@ $ export FLASK_ENV=development
 5. Create the test database.
 
 ```
-$ cd tests
-$ python make_test_database.py
-$ cd ..
+$ flask db init
 ```
 
 6. Run the app.
