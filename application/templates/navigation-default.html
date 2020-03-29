@@ -1,0 +1,13 @@
+<nav class="navigation-default">
+  <div class="nav-wrapper">
+    <div class="left-nav">
+        <img src="{{ url_for('static', filename='img/logo.png') }}"
+             alt="logo" />
+      <a href="{{ url_for('home_bp.home') }}">Home</a>
+      <a href="{{ url_for('home_bp.about') }}">About</a>
+      <a href="{{ url_for('signup_bp.signup') }}">Register</a>
+      <a href="{{ url_for('login_bp.login') }}">Log In</a>
+      <a href="{{ url_for('login_bp.logout') }}">Log Out</a>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% include "navigation-default.html" %}
+<div class="container">
+<div class="formwrapper">
+  <h1 class="title">{{body}}</h1>
+    <form method="POST">
+
+      {{ form.csrf_token }}
+      {{ form.hidden_tag() }}
+
+      {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message }}
+        </div>
+      {% endfor %}
+
+      <!-- TODO :: Reduce some of the code duplication here. -->
+      <ul>
+
+       <!-- Email address field -->
+      <li>
+        <div class="form-field">{{ form.email_address.label }} {{ form.email_address }}
+          {% if form.email_address.errors %}
+            <ul class="errors">
+              {% for error in form.email_address.errors %}<li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      </li>
+
+       <!-- Password field -->
+      <li>
+        <div class="form-field">{{ form.password.label }} {{ form.password }}
+          {% if form.password.errors %}
+            <ul class="errors">
+              {% for error in form.password.errors %}<li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      </li>
+
+    </ul>
+
+    {{ form.submit }}
+
+    </form>
+  </div>
+    <div class="loginsignup">
+      <br>
+      <span>Don't have an account? <a href="{{ url_for('signup_bp.signup') }}">Sign up.</a></span>
+    </div>
+  </div>
+{% endblock %}
