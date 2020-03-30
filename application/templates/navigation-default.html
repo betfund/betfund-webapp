@@ -1,13 +1,7 @@
-<nav class="navigation-default">
-  <div class="nav-wrapper">
-    <div class="left-nav">
-        <img src="{{ url_for('static', filename='img/logo.png') }}"
-             alt="logo" />
-      <a href="{{ url_for('home_bp.home') }}">Home</a>
-      <a href="{{ url_for('home_bp.about') }}">About</a>
-      <a href="{{ url_for('signup_bp.signup') }}">Register</a>
-      <a href="{{ url_for('login_bp.login') }}">Log In</a>
-      <a href="{{ url_for('login_bp.logout') }}">Log Out</a>
-    </div>
-  </div>
-</nav>
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
+    <h5 class="my-0 mr-md-auto font-weight-bold"><a href="{{ url_for('home_bp.home') }}" style="text-decoration: none; color: inherit;">Betfund</a></h5>
+    <nav class="my-2 my-md-0 mr-md-3">
+        <a class="p-2 text-dark" href="{{ url_for('login_bp.login') }}">Login</a>
+    </nav>
+    <a class="btn btn-outline-primary" href="{{ url_for('signup_bp.signup') }}">Sign up</a>
+</div>

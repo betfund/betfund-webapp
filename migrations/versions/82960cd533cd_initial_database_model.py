@@ -1,8 +1,8 @@
-"""initial er diagram implementation
+"""initial database model
 
-Revision ID: 38c0f928bff3
+Revision ID: 82960cd533cd
 Revises: 
-Create Date: 2020-03-29 17:42:56.717303
+Create Date: 2020-03-30 20:39:47.945623
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '38c0f928bff3'
+revision = '82960cd533cd'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,58 +21,59 @@ def upgrade():
     op.create_table('lines',
     sa.Column('id', sa.String(length=64), nullable=False),
     sa.Column('details', sa.JSON(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_lines'))
     )
     op.create_table('strategies',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=256), nullable=False),
     sa.Column('code', sa.String(length=128), nullable=False),
     sa.Column('details', sa.JSON(), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('code')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_strategies')),
+    sa.UniqueConstraint('code', name=op.f('uq_strategies_code'))
     )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('first_name', sa.String(length=256), nullable=False),
     sa.Column('last_name', sa.String(length=256), nullable=False),
-    sa.Column('phone_number', sa.String(length=12), nullable=True),
+    sa.Column('phone_number', sa.String(length=10), nullable=True),
     sa.Column('email_address', sa.String(length=256), nullable=False),
     sa.Column('password', sa.String(length=256), nullable=False),
     sa.Column('created_on', sa.DateTime(timezone=True), nullable=True),
     sa.Column('modified_on', sa.DateTime(timezone=True), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.Column('role', sa.String(length=16), nullable=False),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_users'))
     )
     op.create_table('funds',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=256), nullable=False),
     sa.Column('description', sa.String(length=516), nullable=False),
     sa.Column('strategy_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['strategy_id'], ['strategies.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['strategy_id'], ['strategies.id'], name=op.f('fk_funds_strategy_id_strategies')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_funds'))
     )
     op.create_table('user_ledgers',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('timestamp', sa.DateTime(timezone=True), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_user_ledgers_user_id_users')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_user_ledgers'))
     )
     op.create_table('fund_ledgers',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('timestamp', sa.DateTime(timezone=True), nullable=True),
     sa.Column('fund_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['fund_id'], ['funds.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['fund_id'], ['funds.id'], name=op.f('fk_fund_ledgers_fund_id_funds')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_fund_ledgers'))
     )
     op.create_table('fund_users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('fund_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['fund_id'], ['funds.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id'),
+    sa.ForeignKeyConstraint(['fund_id'], ['funds.id'], name=op.f('fk_fund_users_fund_id_funds')),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_fund_users_user_id_users')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_fund_users')),
     sa.UniqueConstraint('fund_id', 'user_id', name='unique_idx_fund_id_user_id')
     )
     op.create_table('investments',
@@ -81,17 +82,17 @@ def upgrade():
     sa.Column('timestamp', sa.DateTime(timezone=True), nullable=True),
     sa.Column('fund_id', sa.Integer(), nullable=False),
     sa.Column('line_id', sa.String(length=64), nullable=False),
-    sa.ForeignKeyConstraint(['fund_id'], ['funds.id'], ),
-    sa.ForeignKeyConstraint(['line_id'], ['lines.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['fund_id'], ['funds.id'], name=op.f('fk_investments_fund_id_funds')),
+    sa.ForeignKeyConstraint(['line_id'], ['lines.id'], name=op.f('fk_investments_line_id_lines')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_investments'))
     )
     op.create_table('fund_user_ledgers',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('timestamp', sa.DateTime(timezone=True), nullable=True),
     sa.Column('fund_user_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['fund_user_id'], ['fund_users.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['fund_user_id'], ['fund_users.id'], name=op.f('fk_fund_user_ledgers_fund_user_id_fund_users')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_fund_user_ledgers'))
     )
     op.create_table('line_votes',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -99,17 +100,17 @@ def upgrade():
     sa.Column('timestamp', sa.DateTime(timezone=True), nullable=True),
     sa.Column('line_id', sa.String(length=64), nullable=False),
     sa.Column('fund_user_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['fund_user_id'], ['fund_users.id'], ),
-    sa.ForeignKeyConstraint(['line_id'], ['lines.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['fund_user_id'], ['fund_users.id'], name=op.f('fk_line_votes_fund_user_id_fund_users')),
+    sa.ForeignKeyConstraint(['line_id'], ['lines.id'], name=op.f('fk_line_votes_line_id_lines')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_line_votes'))
     )
     op.create_table('results',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('is_win', sa.Boolean(), nullable=False),
     sa.Column('investment_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['investment_id'], ['investments.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['investment_id'], ['investments.id'], name=op.f('fk_results_investment_id_investments')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_results'))
     )
     # ### end Alembic commands ###
 

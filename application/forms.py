@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo
+from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 
 class SignUpForm(FlaskForm):
@@ -8,26 +8,29 @@ class SignUpForm(FlaskForm):
     Class to encapsulate sign up form
     """
     first_name = StringField(
-        'First Name:',
-        validators=[DataRequired()]
+        'First name',
+        validators=[DataRequired(message="Please enter your first name.")]
     )
     last_name = StringField(
-        'Last Name:',
-        validators=[DataRequired()]
+        'Last name',
+        validators=[DataRequired(message="Please enter your last name.")]
     )
     email_address = StringField(
-        'Email Address:',
+        'Email address',
         validators=[
-            DataRequired(),
+            DataRequired(message="Please enter an email."),
             Email(message='Enter a valid email.')
         ]
     )
     password = PasswordField(
-        'Password:',
-        validators=[DataRequired()]
+        'Password',
+        validators=[
+            DataRequired(message="Please enter a password."),
+            Length(min=8, max=24, message="Password must be between 8 and 24 characters.")
+        ]
     )
     password_check = PasswordField(
-        'Reenter Password:',
+        'Re-enter password',
         validators=[
             DataRequired(message="Please re-enter a password."),
             EqualTo('password', message='Passwords must match.')
@@ -42,15 +45,15 @@ class LogInForm(FlaskForm):
     Class to encapsulate log in form
     """
     email_address = StringField(
-        'Email Address:',
+        'Email address',
         validators=[
-            DataRequired(),
+            DataRequired(message="Please enter your email."),
             Email(message='Enter a valid email.')
         ]
     )
     password = PasswordField(
-        'Password:',
-        validators=[DataRequired()]
+        'Password',
+        validators=[DataRequired(message="Please enter your password.")]
     )
 
     submit = SubmitField('Log In')

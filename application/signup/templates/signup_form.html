@@ -1,94 +1,53 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
 {% block content %}
+
 {% include "navigation-default.html" %}
+
 <div class="container">
-<div class="formwrapper">
-  <h1 class="title">{{body}}</h1>
-  <form method="POST" action="/signup">
-
-    {{ form.csrf_token }}
-    {{ form.hidden_tag() }}
-
-    {% for message in get_flashed_messages() %}
-      <div class="alert alert-warning">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          {{ message }}
-      </div>
-    {% endfor %}
-
-    <!-- TODO :: Reduce some of the code duplication here. -->
-    <ul>
-
-    <!-- First name field -->
-    <li>
-      <div class="form-field">{{ form.first_name.label }} {{ form.first_name }}
-        {% if form.email_address.errors %}
-          <ul class="errors">
-            {% for error in form.first_name.errors %}<li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      </div>
-    </li>
-
-    <!-- Last name field -->
-    <li>
-      <div class="form-field">{{ form.last_name.label }} {{ form.last_name }}
-        {% if form.last_name.errors %}
-          <ul class="errors">
-            {% for error in form.last_name.errors %}<li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      </div>
-    </li>
-
-    <!-- Email address field -->
-    <li>
-      <div class="form-field">{{ form.email_address.label }} {{ form.email_address }}
-        {% if form.email_address.errors %}
-          <ul class="errors">
-            {% for error in form.email_address.errors %}<li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      </div>
-    </li>
-
-    <!-- Password field -->
-    <li>
-      <div class="form-field">{{ form.password.label }} {{ form.password }}
-        {% if form.password.errors %}
-          <ul class="errors">
-            {% for error in form.password.errors %}<li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      </div>
-    </li>
-
-    <!-- Password check field -->
-    <li>
-      <div class="form-field">{{ form.password_check.label }} {{ form.password_check }}
-        {% if form.password_check.errors %}
-          <ul class="errors">
-            {% for error in form.password_check.errors %}<li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      </div>
-    </li>
-
-    </ul>
-
-    {{ form.submit }}
-
-  </form>
-</div>
     <br>
-    <div class="loginsignup">
-      <span>Already have an account? <a href="{{ url_for('login_bp.login') }}">Log in.</a></span>
-    </div>
+    <h1 class="h3 mb-3 font-weight-normal">Sign up</h1>
+    <br>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <p class="text-danger">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('signup_bp.signup') }}" method="POST">
+
+        {{ form.csrf_token }}
+        {{ form.hidden_tag() }}
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="inputFirstName">{{ form.first_name.label }}</label>
+                {{ form.first_name(class='form-control', placeholder='First name', required=True, autofocus=True, autocomplete='off', id='inputFirstName') }}
+            </div>
+            <div class="form-group col-md-6">
+                <label for="inputLastName">{{ form.last_name.label }}</label>
+                {{ form.last_name(class='form-control', placeholder='Last name', required=True, autocomplete='off', id='inputFirstName') }}
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputAddress">{{ form.email_address.label }}</label>
+            {{ form.email_address(class='form-control', placeholder='Email address', required=True, autocomplete='off', id='inputEmail') }}
+        </div>
+        <div class="form-group">
+            <label for="inputAddress2">{{ form.password.label }}</label>
+            {{ form.password(class='form-control', placeholder='Password', required=True, autocomplete='off', id='inputPassword') }}
+        </div>
+        <div class="form-group">
+            <label for="inputAddress2">{{ form.password_check.label }}</label>
+            {{ form.password_check(class='form-control', placeholder='Password again', autocomplete='off', required=True, id='inputPassword') }}
+        </div>
+
+        {{ form.submit(class='btn btn-primary') }}
+-
+    </form>
 </div>
+
+{% include "footer-default.html" %}
+
 {% endblock %}

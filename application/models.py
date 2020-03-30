@@ -5,7 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from application import db
 
 
-class User(UserMixin, db.Model):
+class User(db.Model, UserMixin):
     """
     SQLAlchemy object :: `users` table.
 
@@ -32,11 +32,12 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(256), nullable=False)
     last_name = db.Column(db.String(256), nullable=False)
-    phone_number = db.Column(db.String(12), nullable=True)  # +18885550000
+    phone_number = db.Column(db.String(10), nullable=True)
     email_address = db.Column(db.String(256), nullable=False)
     password = db.Column(db.String(256), nullable=False)
     created_on = db.Column(db.DateTime(timezone=True), default=func.now())
     modified_on = db.Column(db.DateTime(timezone=True), default=func.now())
+    role = db.Column(db.String(16), nullable=False)
 
     def set_password(self, password):
         """
@@ -49,6 +50,13 @@ class User(UserMixin, db.Model):
         Check hashed password.
         """
         return check_password_hash(self.password, password)
+
+    @property
+    def is_admin(self):
+        """
+        Check if user is admin.
+        """
+        return self.role == 'admin'
 
     def __repr__(self):
         return f"<User `{self.id}`>"
@@ -78,6 +86,7 @@ class UserLedger(db.Model):
 
     # relationships
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user = db.relationship('User', backref=db.backref('userledger', lazy='dynamic'))
 
     def __repr__(self):
         return f"<UserLedger `{self.id}`>"
@@ -107,8 +116,12 @@ class FundUser(db.Model):
     )
 
     id = db.Column(db.Integer, primary_key=True)
+
+    # relationships
     fund_id = db.Column(db.Integer, db.ForeignKey("funds.id"), nullable=False)
+    fund = db.relationship('Fund', backref=db.backref('funduser', lazy='dynamic'))
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user = db.relationship('User', backref=db.backref('funduser', lazy='dynamic'))
 
     def __repr__(self):
         return f"<FundUser `{self.id}`>"
@@ -196,6 +209,7 @@ class FundUserLedger(db.Model):
 
     # relationships
     fund_user_id = db.Column(db.Integer, db.ForeignKey("fund_users.id"), nullable=False)
+    fund_user = db.relationship('FundUser', backref=db.backref('funduserledger', lazy='dynamic'))
 
     def __repr__(self):
         return f"<FundUserLedger `{self.id}`>"
@@ -225,6 +239,7 @@ class FundLedger(db.Model):
 
     # relationships
     fund_id = db.Column(db.Integer, db.ForeignKey("funds.id"), nullable=False)
+    fund = db.relationship('Fund', backref=db.backref('fundledger', lazy='dynamic'))
 
     def __repr__(self):
         return f"<FundLedger `{self.id}`>"
@@ -250,6 +265,7 @@ class Fund(db.Model):
 
     # relationships
     strategy_id = db.Column(db.Integer, db.ForeignKey("strategies.id"), nullable=False)
+    strategy = db.relationship('Strategy', backref=db.backref('fund', lazy='dynamic'))
 
     def __repr__(self):
         return f"<Fund `{self.id}`>"

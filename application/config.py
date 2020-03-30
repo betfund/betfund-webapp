@@ -8,6 +8,8 @@ class Config:
     DEBUG = False
     TESTING = False
 
+    FLASK_ADMIN_SWATCH = 'cyborg'
+
 
 class ProductionConfig(Config):
     pass

@@ -12,6 +12,7 @@ def signup():
     End point for sign up page.
     """
     form = SignUpForm()
+
     if form.validate_on_submit():
 
         # get the form data, if submission was valid
@@ -28,7 +29,8 @@ def signup():
             user = User(
                 first_name=first_name,
                 last_name=last_name,
-                email_address=email_address
+                email_address=email_address,
+                role='user'
             )
             user.set_password(password)
 
@@ -42,11 +44,15 @@ def signup():
         flash('A user already exists with that email address.')
         return redirect(url_for('signup_bp.signup'))
 
+    # handle form errors
+    for error_type, error_messages in form.errors.items():
+        for message in error_messages:
+            flash(message)
+
     return render_template(
         'signup_form.html',
         form=form,
-        template='template main',
-        body="Register"
+        title="Sign Up"
     )
 
 

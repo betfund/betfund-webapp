@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, redirect, render_template, url_for
+from flask_login import current_user
 
 home_bp = Blueprint('home_bp', __name__, template_folder='templates')
 
@@ -10,11 +11,12 @@ def home():
 
     TODO :: This needs to be updated.
     """
+    if current_user.is_authenticated:
+        return redirect(url_for('loggedin_bp.dashboard'))
+
     return render_template(
         'index.html',
         title='Home',
-        template='template main',
-        body="Home"
     )
 
 
