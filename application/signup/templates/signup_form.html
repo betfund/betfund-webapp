@@ -18,24 +18,24 @@
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="inputFirstName">{{ form.first_name.label }}</label>
-                {{ form.first_name(class='form-control', placeholder='First name', required=True, autofocus=True, autocomplete='off', id='inputFirstName') }}
+                {{ form.first_name(class='form-control', type="text", placeholder='First name', required=True, autofocus=True, autocomplete='off', id='inputFirstName') }}
             </div>
             <div class="form-group col-md-6">
                 <label for="inputLastName">{{ form.last_name.label }}</label>
-                {{ form.last_name(class='form-control', placeholder='Last name', required=True, autocomplete='off', id='inputFirstName') }}
+                {{ form.last_name(class='form-control', type="text", placeholder='Last name', required=True, autocomplete='off', id='inputFirstName') }}
             </div>
         </div>
         <div class="form-group">
-            <label for="inputAddress">{{ form.email_address.label }}</label>
-            {{ form.email_address(class='form-control', placeholder='Email address', required=True, autocomplete='off', id='inputEmail') }}
+            <label for="inputEmail">{{ form.email_address.label }}</label>
+            {{ form.email_address(class='form-control', type="email", placeholder='Email address', required=True, autocomplete='off', id='inputEmail') }}
         </div>
         <div class="form-group">
-            <label for="inputAddress2">{{ form.password.label }}</label>
-            {{ form.password(class='form-control', placeholder='Password', required=True, autocomplete='off', id='inputPassword') }}
+            <label for="inputPassword">{{ form.password.label }}</label>
+            {{ form.password(class='form-control', type="password", placeholder='Password', required=True, autocomplete='off', id='inputPassword') }}
         </div>
         <div class="form-group">
-            <label for="inputAddress2">{{ form.password_check.label }}</label>
-            {{ form.password_check(class='form-control', placeholder='Password again', autocomplete='off', required=True, id='inputPassword') }}
+            <label for="inputPassword2">{{ form.password_check.label }}</label>
+            {{ form.password_check(class='form-control', type="password", placeholder='Password again', autocomplete='off', required=True, id='inputPassword2') }}
         </div>
         {{ form.submit(class='btn btn-primary') }}
         -

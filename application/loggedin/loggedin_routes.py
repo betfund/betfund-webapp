@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, url_for
+from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
 
 from application import db, login_manager
@@ -11,6 +11,7 @@ loggedin_bp = Blueprint('loggedin_bp', __name__, template_folder='templates')
 @login_manager.unauthorized_handler
 def unauthorized_callback():
     """Redirects an unaurhtorize user to login page."""
+    flash('Please sign in to continue.')
     return redirect(url_for('login_bp.login'))
 
 

@@ -18,11 +18,11 @@
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="inputEmail">{{ form.email_address.label }}</label>
-                {{ form.email_address(class='form-control', placeholder='Email', required=True, autofocus=True, autocomplete='off', id='inputFirstName') }}
+                {{ form.email_address(class='form-control', type="email", placeholder='Email', required=True, autofocus=True, autocomplete='off', id='inputFirstName') }}
             </div>
             <div class="form-group col-md-6">
                 <label for="inputPassword">{{ form.password.label }}</label>
-                {{ form.password(class='form-control', placeholder='Password', required=True, autocomplete='off', id='inputFirstName') }}
+                {{ form.password(class='form-control', type="password", placeholder='Password', required=True, autocomplete='off', id='inputFirstName') }}
             </div>
         </div>
         {{ form.submit(class='btn btn-primary') }}

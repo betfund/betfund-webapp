@@ -42,7 +42,7 @@ def login():
 
         # otherwise, tell them the password is invalid
         # and send them back to the login page to try again
-        flash('Invalid username/password combination')
+        flash('Invalid email/password combination')
         return redirect(url_for('login_bp.login'))
 
     # notify of any form errors
