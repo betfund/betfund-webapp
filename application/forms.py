@@ -57,3 +57,13 @@ class LogInForm(FlaskForm):
     )
 
     submit = SubmitField('Log In')
+
+
+class SearchForm(FlaskForm):
+    """
+    Class to encapsulate search form
+    """
+    text = StringField(
+        'Search terms',
+        validators=[DataRequired("Please enter your search terms.")]
+    )

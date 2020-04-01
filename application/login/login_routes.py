@@ -12,7 +12,12 @@ login_bp = Blueprint('login_bp', __name__, template_folder='templates')
 def login():
     """
     End point for login page.
+
+    GET:    Redirects user to their dashboard if they are logged in.
+    POST:   Attempts a login; if fail, reaches redirect back with error messages.
     """
+
+    # redirect user to dashboard if they are authenticated
     if current_user.is_authenticated:
         return redirect(url_for('loggedin_bp.dashboard'))
 
@@ -40,12 +45,15 @@ def login():
         flash('Invalid username/password combination')
         return redirect(url_for('login_bp.login'))
 
+    # notify of any form errors
+    for error_type, error_messages in login_form.errors.items():
+        for message in error_messages:
+            flash(message)
+
     return render_template(
         'login_form.html',
         form=login_form,
         title='Log in',
-        template='template main',  # template='login-page',
-        body="Log in"
     )
 
 
@@ -54,6 +62,8 @@ def login():
 def logout():
     """
     End point for log out.
+
+    GET: Logs out a user and redirects them to login page.
     """
     logout_user()
     return redirect(url_for('login_bp.login'))

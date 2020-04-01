@@ -2,17 +2,15 @@ import os
 from pathlib import Path
 
 from flask import Flask
-from werkzeug.utils import import_string
-
 from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
+from werkzeug.utils import import_string
 
 # Possible configurations
-# TODO :: Make production the default at some point
+# TODO: Make production the default at some point
 config_dict = {
     "production": "application.config.ProductionConfig",
     "testing": "application.config.TestConfig",
@@ -50,27 +48,28 @@ def create_app(test_config=True):
     admininstrator.init_app(app)
     db.init_app(app)
     db.app = app
-    # TODO :: `render_as_batch` only for SQLite..
+    # TODO: `render_as_batch` only for SQLite..
     migrate.init_app(app, db, render_as_batch=True)
     login_manager.init_app(app)
 
     with app.app_context():
 
+        # Import the Admin views
+        from application.admin.admin_routes import add_admin_views
+
+        # Register Admin routes
+        add_admin_views(admininstrator)
+
         # Import the the Blueprints
-        # (this has to happen inside the app context)
         from application.home.home_routes import home_bp
         from application.loggedin.loggedin_routes import loggedin_bp
         from application.signup.signup_routes import signup_bp
         from application.login.login_routes import login_bp
-        from application.admin.admin_routes import add_admin_views
 
         # Register Blueprints
         app.register_blueprint(home_bp, url_prefix='/')
         app.register_blueprint(loggedin_bp)
         app.register_blueprint(signup_bp)
         app.register_blueprint(login_bp)
-
-        # Admin Handling
-        add_admin_views(admininstrator)
 
         return app

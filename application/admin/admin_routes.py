@@ -1,4 +1,5 @@
 from flask_admin.contrib.sqla import ModelView
+from flask_login import login_required
 
 from application import db
 from application.models import (
@@ -14,7 +15,6 @@ from application.models import (
     User,
     UserLedger
 )
-from flask_login import login_required
 
 
 def add_admin_views(administrator):

@@ -1,25 +1,20 @@
 {% extends "base.html" %}
-
 {% block content %}
-
 {% include "navigation-default.html" %}
-
 <div class="container">
     <br>
     <h1 class="h3 mb-3 font-weight-normal">Sign in</h1>
     <br>
     {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <p class="text-danger">{{ message }}</p>
-        {% endfor %}
-      {% endif %}
+    {% if messages %}
+    {% for message in messages %}
+    <p class="text-danger">{{ message }}</p>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
     <form action="{{ url_for('login_bp.login') }}" method="POST">
-
         {{ form.csrf_token }}
         {{ form.hidden_tag() }}
-
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="inputEmail">{{ form.email_address.label }}</label>
@@ -30,12 +25,8 @@
                 {{ form.password(class='form-control', placeholder='Password', required=True, autocomplete='off', id='inputFirstName') }}
             </div>
         </div>
-
         {{ form.submit(class='btn btn-primary') }}
-
     </form>
 </div>
-
 {% include "footer-default.html" %}
-
 {% endblock %}

@@ -10,16 +10,21 @@ signup_bp = Blueprint('signup_bp', __name__, template_folder='templates')
 def signup():
     """
     End point for sign up page.
-    """
-    form = SignUpForm()
 
-    if form.validate_on_submit():
+    GET:    Returns the sign up page.
+    POST:   Attempts signup; if fail, redirect and display errors. If success,
+                redirect to signup succes page.
+
+    """
+    signup_form = SignUpForm()
+
+    if signup_form.validate_on_submit():
 
         # get the form data, if submission was valid
-        first_name = form.first_name.data
-        last_name = form.last_name.data
-        email_address = form.email_address.data
-        password = form.password.data
+        first_name = signup_form.first_name.data
+        last_name = signup_form.last_name.data
+        email_address = signup_form.email_address.data
+        password = signup_form.password.data
 
         # check to see if this user already exists in the database
         if User.query.filter_by(email_address=email_address).first() is None:
@@ -44,14 +49,14 @@ def signup():
         flash('A user already exists with that email address.')
         return redirect(url_for('signup_bp.signup'))
 
-    # handle form errors
-    for error_type, error_messages in form.errors.items():
+    # notify of any form errors
+    for error_type, error_messages in signup_form.errors.items():
         for message in error_messages:
             flash(message)
 
     return render_template(
         'signup_form.html',
-        form=form,
+        form=signup_form,
         title="Sign Up"
     )
 
