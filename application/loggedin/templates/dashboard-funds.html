@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% include "navigation-loggedin.html" %}
+{% include "dashboard-container-start.html" %}
+{% include "sidebar-loggedin.html" %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+        <h1 class="h2">Funds</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                Create a fund
+            </button>
+        </div>
+    </div>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <p class="text-danger">{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <br>
+    <h2 class="lead">Existing Funds</h2>
+    <br>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th width="10%">FundID</th>
+                    <th width="25%">Fund Name</th>
+                    <th>Description</th>
+                    <th width="10%">StrategyID</th>
+                    <th width="10%">OwnerID</th>
+                    <th width="10%">Member Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in existing_funds %}
+                <tr>
+                    <td>{{ row.id }}</td>
+                    <td><a href="{{ url_for('loggedin_bp.fund', fund_id=row.id) }}">{{ row.name }}</a></td>
+                    <td>{{ row.description }}</td>
+                    <td>{{ row.strategy_id }}</td>
+                    <td>{{ row.owner_id }}</td>
+                    <td>{{ row.fund_member_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create a Fund</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('loggedin_bp.funds') }}" method="POST">
+                    {{ form.csrf_token }}
+                    {{ form.hidden_tag() }}
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="inputFundName">{{ form.fund_name.label }}</label>
+                            {{ form.fund_name(class='form-control', type="text", placeholder='Fund Name', required=True, autofocus=True, autocomplete='off', id='inputFundName') }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="inputFundDescription">{{ form.fund_description.label }}</label>
+                            {{ form.fund_description(class='form-control', type="text", placeholder='Fund description', required=True, autocomplete='off', id='inputFundDescription') }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="inputStrategySports">{{ form.strategy_sports.label }}</label>
+                            {{ form.strategy_sports(class='form-control', required=True) }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="inputSchedule">{{ form.strategy_solicitation_schedule.label }}</label>
+                            {{ form.strategy_solicitation_schedule(class='form-control', required=True) }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="inputScheduleStart">{{ form.strategy_solicitation_schedule_start.label }}</label>
+                            {{ form.strategy_solicitation_schedule_start(class='form-control', autocomplete='off', required=False) }}
+                        </div>
+                    </div>
+                    {{ form.submit(class='btn btn-primary') }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include "dashboard-container-end.html" %}
+{% include "footer-loggedin.html" %}
+{% endblock %}

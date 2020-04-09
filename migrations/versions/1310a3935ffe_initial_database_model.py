@@ -1,8 +1,8 @@
 """initial database model
 
-Revision ID: 82960cd533cd
+Revision ID: 1310a3935ffe
 Revises: 
-Create Date: 2020-03-30 20:39:47.945623
+Create Date: 2020-04-02 02:15:53.705358
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '82960cd533cd'
+revision = '1310a3935ffe'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -40,7 +40,7 @@ def upgrade():
     sa.Column('password', sa.String(length=256), nullable=False),
     sa.Column('created_on', sa.DateTime(timezone=True), nullable=True),
     sa.Column('modified_on', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('role', sa.String(length=16), nullable=False),
+    sa.Column('role', sa.String(length=16), nullable=True),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_users'))
     )
     op.create_table('funds',
@@ -86,6 +86,14 @@ def upgrade():
     sa.ForeignKeyConstraint(['line_id'], ['lines.id'], name=op.f('fk_investments_line_id_lines')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_investments'))
     )
+    op.create_table('surveys',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('start_time', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('end_time', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('fund_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['fund_id'], ['funds.id'], name=op.f('fk_surveys_fund_id_funds')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_surveys'))
+    )
     op.create_table('fund_user_ledgers',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Float(), nullable=False),
@@ -120,6 +128,7 @@ def downgrade():
     op.drop_table('results')
     op.drop_table('line_votes')
     op.drop_table('fund_user_ledgers')
+    op.drop_table('surveys')
     op.drop_table('investments')
     op.drop_table('fund_users')
     op.drop_table('fund_ledgers')

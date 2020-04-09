@@ -25,6 +25,8 @@ class User(db.Model, UserMixin):
         When was the user created.
     modified_on : str
         When was the user information modified.
+    role : str
+        Optional. Only instantiated upon verification of user or admin.
     """
 
     __tablename__ = "users"
@@ -37,7 +39,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(256), nullable=False)
     created_on = db.Column(db.DateTime(timezone=True), default=func.now())
     modified_on = db.Column(db.DateTime(timezone=True), default=func.now())
-    role = db.Column(db.String(16), nullable=False)
+    role = db.Column(db.String(16), nullable=True)
 
     def set_password(self, password):
         """
@@ -52,11 +54,25 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password, password)
 
     @property
-    def is_admin(self):
+    def is_confirmed(self):
         """
-        Check if user is admin.
+        Check if user is verified.
         """
-        return self.role == 'admin'
+        return self.role == 'admin' or self.role == 'user'
+
+    @property
+    def is_new(self):
+        """
+        Check if user is new with unverified account.
+        """
+        return self.role == None
+
+    @property
+    def is_user(self):
+        """
+        Check if verified user.
+        """
+        return self.role == 'user'
 
     def __repr__(self):
         return f"<User `{self.id}`>"
@@ -266,6 +282,8 @@ class Fund(db.Model):
     # relationships
     strategy_id = db.Column(db.Integer, db.ForeignKey("strategies.id"), nullable=False)
     strategy = db.relationship('Strategy', backref=db.backref('fund', lazy='dynamic'))
+    owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    owner = db.relationship('User', backref=db.backref('fund', lazy='dynamic'))
 
     def __repr__(self):
         return f"<Fund `{self.id}`>"
@@ -328,6 +346,32 @@ class Investment(db.Model):
 
     def __repr__(self):
         return f"<Investment `{self.id}`>"
+
+
+class Survey(db.Model):
+    """
+    SQLAlchemy object :: "surveys" table.
+
+    Fields
+    ------
+    id : int
+        The primary key and survey identifier.
+    start_time : datetime
+        Time when survey goes live.
+    end_time : datetime
+        Time when survey ends.
+    fund_id : int
+        The fund identifier.
+    """
+
+    __tablename__ = "surveys"
+
+    id = db.Column(db.Integer, primary_key=True)
+    start_time = db.Column(db.DateTime(timezone=True))
+    end_time = db.Column(db.DateTime(timezone=True))
+
+    # relationships
+    fund_id = db.Column(db.Integer, db.ForeignKey("funds.id"), nullable=False)
 
 
 class Result(db.Model):

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% include "navigation-loggedin.html" %}
+{% include "dashboard-container-start.html" %}
+{% include "sidebar-loggedin.html" %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ fund.fund_name }} (ID: #{{ fund.fund_id }})</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            {% if user.id == fund.owner_id %}
+                <div style="margin-right: 24px;">
+                    <strong>Invested:</strong> {{ "${:,.2f}".format(fund_user_investment) }}
+                    <br>
+                    <span class="text-success">You own this fund.</span>
+                </div>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                    Invest
+                </button>
+            {% endif %}
+        </div>
+    </div>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <p class="text-danger">{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <br>
+    <h2 class="lead">Information</h2>
+    <br>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <tbody>
+                <tr>
+                    <th width="20%">ID</th>
+                    <td>{{ fund.fund_id }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Name</th>
+                    <td>{{ fund.fund_name }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Description</th>
+                    <td>{{ fund.fund_description }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Owner Name</th>
+                    <td>{{ fund.owner_first_name }} {{ fund.owner_last_name }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Owner Email</th>
+                    <td>{{ fund.owner_email_address }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Strategy ID</th>
+                    <td>{{ fund.strategy_id }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Strategy Name</th>
+                    <td>{{ fund.strategy_name }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Strategy Code</th>
+                    <td>{{ fund.strategy_code }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Sports Focus</th>
+                    <td>
+                        <ul>
+                            {% for sport in fund.strategy_details['sports'] %}
+                                <li>{{ sport }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th width="20%">Member Count</th>
+                    <td>{{ fund.fund_member_count }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create a Fund</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('loggedin_bp.fund', fund_id=fund.fund_id) }}" method="POST">
+                    {{ form.csrf_token }}
+                    {{ form.hidden_tag() }}
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="inputFundName">{{ form.amount.label }}</label>
+                            {{ form.amount(class='form-control', type="text", placeholder='Invest Amount', required=True, autofocus=True, autocomplete='off', id='inputAmount') }}
+                        </div>
+                    </div>
+                    {{ form.submit(class='btn btn-primary') }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% include "dashboard-container-end.html" %}
+{% include "footer-loggedin.html" %}
+{% endblock %}

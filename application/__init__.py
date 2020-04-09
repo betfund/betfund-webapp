@@ -4,6 +4,7 @@ from pathlib import Path
 from flask import Flask
 from flask_admin import Admin
 from flask_login import LoginManager
+from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
@@ -29,8 +30,9 @@ naming_convention = {
 # Set globals
 admininstrator = Admin(name='Betfund')
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
-migrate = Migrate()
 login_manager = LoginManager()
+mail = Mail()
+migrate = Migrate()
 
 
 def create_app(test_config=True):
@@ -44,32 +46,51 @@ def create_app(test_config=True):
     config = import_string(config_dict[config_name])()
     app.config.from_object(config)
 
-    # Initialize plug-ins
+    ## Initialize plug-ins
+
+    # `flask-admin`
     admininstrator.init_app(app)
+
+    # `flask-sqlalchemy`
     db.init_app(app)
     db.app = app
+
+    # `flask-login`
+    login_manager.init_app(app)
+
+    # `flask-mail`
+    mail.init_app(app)
+
+    # `flask-migrate`
     # TODO: `render_as_batch` only for SQLite..
     migrate.init_app(app, db, render_as_batch=True)
-    login_manager.init_app(app)
 
     with app.app_context():
 
-        # Import the Admin views
-        from application.admin.admin_routes import add_admin_views
+        # Register the the Blueprints
 
-        # Register Admin routes
-        add_admin_views(admininstrator)
-
-        # Import the the Blueprints
+        # Home page
         from application.home.home_routes import home_bp
-        from application.loggedin.loggedin_routes import loggedin_bp
-        from application.signup.signup_routes import signup_bp
-        from application.login.login_routes import login_bp
-
-        # Register Blueprints
         app.register_blueprint(home_bp, url_prefix='/')
+
+        # Main dashboard/newsfeed page
+        from application.loggedin.loggedin_routes import loggedin_bp
         app.register_blueprint(loggedin_bp)
-        app.register_blueprint(signup_bp)
+
+        # Login page
+        from application.login.login_routes import login_bp
         app.register_blueprint(login_bp)
 
-        return app
+        # Signup page
+        from application.signup.signup_routes import signup_bp
+        app.register_blueprint(signup_bp)
+
+        # Survey page
+        from application.surveys.survey_routes import survey_bp
+        app.register_blueprint(survey_bp)
+
+        # Import the Admin views
+        from application.admin.admin_routes import add_admin_views
+        add_admin_views(admininstrator)
+    
+    return app

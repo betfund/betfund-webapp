@@ -6,11 +6,11 @@
     <h1 class="h3 mb-3 font-weight-normal">Sign in</h1>
     <br>
     {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    {% for message in messages %}
-    <p class="text-danger">{{ message }}</p>
-    {% endfor %}
-    {% endif %}
+        {% if messages %}
+            {% for message in messages %}
+                <p class="text-danger">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
     {% endwith %}
     <form action="{{ url_for('login_bp.login') }}" method="POST">
         {{ form.csrf_token }}
