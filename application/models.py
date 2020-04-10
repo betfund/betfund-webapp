@@ -282,6 +282,7 @@ class Fund(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), nullable=False)
     description = db.Column(db.String(516), nullable=False)
+    timestamp = db.Column(db.DateTime(timezone=True), default=datetime.utcnow())
 
     # relationships
     strategy_id = db.Column(db.Integer, db.ForeignKey("strategies.id"), nullable=False)

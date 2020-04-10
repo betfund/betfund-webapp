@@ -67,8 +67,7 @@ def create_app(test_config=True):
 
     with app.app_context():
 
-        # Register the the Blueprints
-
+        ## Register the the Blueprints
         # Home page
         from application.views.home import home_bp
         app.register_blueprint(home_bp, url_prefix="/")

@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
 
+from dateutil.parser import parse
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.sql import and_, func
@@ -18,6 +19,27 @@ from application.models import (
 from application.views.funds.forms import CreateFundForm, InvestFundForm, JoinFundForm
 
 funds_bp = Blueprint("funds_bp", __name__, template_folder="templates")
+
+
+@funds_bp.app_template_filter('pretty_date')
+def pretty_date(date, fmt='%b %d, %Y'):
+    """Converts a date to pretty format.
+
+    Parameters
+    ----------
+    date : datetime.datetime
+        Datetime object for which to format.
+    fmt : str
+        String datetime format representation.
+
+    Returns
+    -------
+    str
+        Formatted datetime object as string.
+    """
+    if not date:
+        return '-'
+    return date.strftime(fmt)
 
 
 @funds_bp.route("/dashboard/funds", methods=["GET", "POST"])
@@ -68,6 +90,7 @@ def funds():
             db.session.add(fund)
             db.session.commit()
 
+            # add the owner as a fund user
             fund_user = FundUser(fund_id=fund.id, user_id=current_user.id)
             db.session.add(fund_user)
             db.session.commit()
@@ -79,18 +102,50 @@ def funds():
         for message in error_messages:
             flash(message)
 
-    # get existing funds
+    # get existing fund and relevant data
+    fund_member_count_cte = (
+        db.session.query(
+            FundUser.fund_id.label("fund_id"),
+            func.coalesce(func.count(FundUser.id), 0).label("member_count"),
+        )
+        .group_by(FundUser.fund_id)
+        .cte("fund_member_count_cte")
+    )
+    fund_capital_size_cte = (
+        db.session.query(
+            FundLedger.fund_id.label("fund_id"),
+            func.coalesce(func.sum(FundLedger.amount), 0).label("capital_size"),
+        )
+        .group_by(FundLedger.fund_id)
+        .cte("fund_capital_size_cte")
+    )
+    fund_meta_cte = db.session.query(
+        Fund.id.label("fund_id"),
+        Fund.name,
+        Fund.description,
+        Fund.timestamp,
+        Fund.owner_id,
+    ).cte("fund_meta_cte")
+    # finally combine all these common table expressions
     existing_funds = (
         db.session.query(
-            Fund.id,
-            Fund.name,
-            Fund.description,
-            Fund.strategy_id,
-            Fund.owner_id,
-            func.coalesce(func.count(FundUser.id), 0).label("fund_member_count"),
+            fund_meta_cte.c.fund_id.label("id"),
+            fund_meta_cte.c.name.label("name"),
+            fund_meta_cte.c.description.label("description"),
+            fund_meta_cte.c.timestamp.label("time_created"),
+            fund_meta_cte.c.owner_id.label("owner_id"),
+            fund_member_count_cte.c.member_count.label("member_count"),
+            func.coalesce(fund_capital_size_cte.c.capital_size, 0).label("capital_size"),
         )
-        .join(FundUser, FundUser.fund_id == Fund.id,)
-        .group_by(Fund.id)
+        .join(
+            fund_member_count_cte,
+            fund_member_count_cte.c.fund_id == fund_meta_cte.c.fund_id,
+        )
+        .outerjoin(
+            fund_capital_size_cte,
+            fund_capital_size_cte.c.fund_id == fund_meta_cte.c.fund_id,
+        )
+        .order_by(fund_capital_size_cte.c.capital_size.desc())
         .all()
     )
 
