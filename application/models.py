@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -37,8 +39,8 @@ class User(db.Model, UserMixin):
     phone_number = db.Column(db.String(10), nullable=True)
     email_address = db.Column(db.String(256), nullable=False)
     password = db.Column(db.String(256), nullable=False)
-    created_on = db.Column(db.DateTime(timezone=True), default=func.now())
-    modified_on = db.Column(db.DateTime(timezone=True), default=func.now())
+    created_on = db.Column(db.DateTime(timezone=True), default=datetime.utcnow())
+    modified_on = db.Column(db.DateTime(timezone=True), default=datetime.utcnow())
     role = db.Column(db.String(16), nullable=True)
 
     def set_password(self, password):
@@ -98,7 +100,7 @@ class UserLedger(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float, nullable=False)
-    timestamp = db.Column(db.DateTime(timezone=True), default=func.now())
+    timestamp = db.Column(db.DateTime(timezone=True), default=datetime.utcnow())
 
     # relationships
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
@@ -221,7 +223,7 @@ class FundUserLedger(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float, nullable=False)
-    timestamp = db.Column(db.DateTime(timezone=True), default=func.now())
+    timestamp = db.Column(db.DateTime(timezone=True), default=datetime.utcnow())
 
     # relationships
     fund_user_id = db.Column(db.Integer, db.ForeignKey("fund_users.id"), nullable=False)
@@ -251,7 +253,7 @@ class FundLedger(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float, nullable=False)
-    timestamp = db.Column(db.DateTime(timezone=True), default=func.now())
+    timestamp = db.Column(db.DateTime(timezone=True), default=datetime.utcnow())
 
     # relationships
     fund_id = db.Column(db.Integer, db.ForeignKey("funds.id"), nullable=False)
@@ -338,7 +340,7 @@ class Investment(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float, nullable=False)
-    timestamp = db.Column(db.DateTime(timezone=True), default=func.now())
+    timestamp = db.Column(db.DateTime(timezone=True), default=datetime.utcnow())
 
     # relationships
     fund_id = db.Column(db.Integer, db.ForeignKey("funds.id"), nullable=False)

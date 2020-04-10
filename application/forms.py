@@ -94,7 +94,7 @@ class DepositForm(FlaskForm):
         validators=[
             DataRequired(message="Please enter an amount."),
             NumberRange(min=0, message="You cannot enter a negative amount."),
-            NumberRange(max=1000, message="Maximum is $1000.")
+            NumberRange(max=10000, message="Maximum is $1000.")
         ]
     )
 
@@ -164,5 +164,21 @@ class InvestFundForm(FlaskForm):
         ]
     )
 
-    submit = SubmitField('Invest')
+    invest = SubmitField('Invest')
+
+
+class JoinFundForm(FlaskForm):
+    """
+    Class to encapsulate investing in a fund
+    """
+
+    amount = FloatField(
+        'Amount',
+        validators=[
+            DataRequired(message="Please enter an amount."),
+            NumberRange(min=0, message="You cannot enter a negative amount."),
+        ]
+    )
+
+    join = SubmitField('Join')
 

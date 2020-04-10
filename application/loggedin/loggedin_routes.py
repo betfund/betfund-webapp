@@ -1,16 +1,17 @@
-import datetime
 import json
 import uuid
+from datetime import datetime
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from sqlalchemy.sql import func
+from sqlalchemy.sql import and_, func
 
 from application import db, login_manager
 from application.forms import (
     CreateFundForm,
     DepositForm,
     InvestFundForm,
+    JoinFundForm,
     SearchForm
 )
 from application.models import (
@@ -42,26 +43,6 @@ def dashboard():
     TODO: This will be updated.
     """
 
-    # available balance
-    available_balance = db.session.query(
-        func.coalesce(func.sum(UserLedger.amount), 0)
-    ).filter(
-        UserLedger.user_id == current_user.id
-    ).first()[0]
-
-    # invested into funds balance
-    invested_balance = db.session.query(
-        func.coalesce(func.sum(FundUserLedger.amount), 0)
-    ).join(
-        FundUser,
-        FundUserLedger.fund_user_id == FundUser.id
-    ).join(
-        User,
-        FundUser.user_id == User.id
-    ).filter(
-        User.id == current_user.id
-    ).first()[0]
-
     # initialize the deposit form
     deposit_form = DepositForm()
     if request.method == 'POST':
@@ -85,6 +66,26 @@ def dashboard():
     for error_type, error_messages in deposit_form.errors.items():
         for message in error_messages:
             flash(message)
+
+    # available balance
+    available_balance = db.session.query(
+        func.coalesce(func.sum(UserLedger.amount), 0)
+    ).filter(
+        UserLedger.user_id == current_user.id
+    ).first()[0]
+
+    # invested into funds balance
+    invested_balance = db.session.query(
+        func.coalesce(func.sum(FundUserLedger.amount), 0)
+    ).join(
+        FundUser,
+        FundUserLedger.fund_user_id == FundUser.id
+    ).join(
+        User,
+        FundUser.user_id == User.id
+    ).filter(
+        User.id == current_user.id
+    ).first()[0]
 
     return render_template(
         'dashboard-home.html',
@@ -155,21 +156,6 @@ def funds():
     TODO: This will be updated.
     """
 
-    # get existing funds
-    existing_funds = db.session.query(
-        Fund.id,
-        Fund.name,
-        Fund.description,
-        Fund.strategy_id,
-        Fund.owner_id,
-        func.coalesce(func.count(FundUser.id), 0).label('fund_member_count')
-    ).join(
-        FundUser,
-        FundUser.fund_id == Fund.id,
-    ).group_by(
-        Fund.id
-    ).all()
-
     # initialize the deposit form
     create_fund_form = CreateFundForm()
     if request.method == 'POST':
@@ -222,6 +208,21 @@ def funds():
         for message in error_messages:
             flash(message)
 
+    # get existing funds
+    existing_funds = db.session.query(
+        Fund.id,
+        Fund.name,
+        Fund.description,
+        Fund.strategy_id,
+        Fund.owner_id,
+        func.coalesce(func.count(FundUser.id), 0).label('fund_member_count')
+    ).join(
+        FundUser,
+        FundUser.fund_id == Fund.id,
+    ).group_by(
+        Fund.id
+    ).all()
+
     return render_template(
         'dashboard-funds.html',
         title='Dashboard - Funds',
@@ -241,58 +242,118 @@ def fund(fund_id):
     """
 
     invest_fund_form = InvestFundForm()
+    join_fund_form = JoinFundForm()
     if request.method == 'POST':
 
-        """Returns the current users available balance."""
-        available_balance = db.session.query(
-            func.coalesce(func.sum(UserLedger.amount), 0)
-        ).filter(
-            UserLedger.user_id == current_user.id
-        ).first()[0]
+        if invest_fund_form.invest.data and \
+            invest_fund_form.validate_on_submit():
+            """Returns the current users available balance."""
+            available_balance = db.session.query(
+                func.coalesce(func.sum(UserLedger.amount), 0)
+            ).filter(
+                UserLedger.user_id == current_user.id
+            ).first()[0]
 
-        # get investment amount
-        amount = invest_fund_form.amount.data
+            # get investment amount
+            amount = invest_fund_form.amount.data
 
-        # check whether the user has enough available capital
-        if amount > available_balance:
-            flash('You do not have sufficient available funds.')
-            return redirect(url_for('loggedin_bp.fund', fund_id=fund_id))
+            # check whether the user has enough available capital
+            if amount > available_balance:
+                flash('You do not have sufficient funds available.')
+                return redirect(url_for('loggedin_bp.fund', fund_id=fund_id))
 
-        timestamp = datetime.datetime.utcnow().replace(microsecond=0)
+            # keep one time stamp for future tracking
+            timestamp = datetime.utcnow()
 
-        # remove incoming investment from user available funds
-        user_ledger = UserLedger(
-            amount=(-amount),
-            user_id=current_user.id,
-            timestamp=timestamp
-        )
-        db.session.add(user_ledger)
+            # remove incoming investment from user available funds
+            user_ledger = UserLedger(
+                amount=(-amount),
+                user_id=current_user.id,
+                timestamp=timestamp
+            )
+            db.session.add(user_ledger)
 
-        # insert money into the fund
-        fund_ledger = FundLedger(
-            amount=amount,
-            timestamp=timestamp,
-            fund_id=fund_id
-        )
-        db.session.add(fund_ledger)
+            # insert money into the fund
+            fund_ledger = FundLedger(
+                amount=amount,
+                timestamp=timestamp,
+                fund_id=fund_id
+            )
+            db.session.add(fund_ledger)
 
-        # get the fund user id of current user
-        fund_user_id = db.session.query(
-            FundUser.id
-        ).filter(
-            FundUser.fund_id == fund_id,
-            FundUser.user_id == current_user.id
-        ).first()[0]
-        # update the fund users ledger balance
-        fund_user_ledger = FundUserLedger(
-            amount=amount,
-            timestamp=timestamp,
-            fund_user_id=fund_user_id
-        )
-        db.session.add(fund_user_ledger)
-        db.session.commit()
+            # get the fund user id of current user
+            fund_user_id = db.session.query(
+                FundUser.id
+            ).filter(
+                FundUser.fund_id == fund_id,
+                FundUser.user_id == current_user.id
+            ).first()[0]
+            # update the fund users ledger balance
+            fund_user_ledger = FundUserLedger(
+                amount=amount,
+                timestamp=timestamp,
+                fund_user_id=fund_user_id
+            )
+            db.session.add(fund_user_ledger)
+            db.session.commit()
 
-        redirect(url_for('loggedin_bp.fund', fund_id=fund_id))
+            return redirect(url_for('loggedin_bp.fund_success', fund_id=fund_id))
+
+        if join_fund_form.join.data and \
+            join_fund_form.validate_on_submit():
+            """Returns the current users available balance."""
+            available_balance = db.session.query(
+                func.coalesce(func.sum(UserLedger.amount), 0)
+            ).filter(
+                UserLedger.user_id == current_user.id
+            ).first()[0]
+
+            # get investment amount
+            amount = join_fund_form.amount.data
+
+            # check whether the user has enough available capital
+            if amount > available_balance:
+                flash('You do not have sufficient funds available.')
+                return redirect(url_for('loggedin_bp.fund', fund_id=fund_id))
+
+            # keep one time stamp for future tracking
+            timestamp = datetime.utcnow()
+
+            # remove incoming investment from user available funds
+            user_ledger = UserLedger(
+                amount=(-amount),
+                user_id=current_user.id,
+                timestamp=timestamp
+            )
+            db.session.add(user_ledger)
+
+            # insert member to fund
+            fund_user = FundUser(
+                fund_id=fund_id,
+                user_id=current_user.id
+            )
+            db.session.add(fund_user)
+            db.session.commit()
+
+            # insert money into the fund
+            fund_ledger = FundLedger(
+                amount=amount,
+                timestamp=timestamp,
+                fund_id=fund_id
+            )
+            db.session.add(fund_ledger)
+
+            # update the fund users ledger balance
+            fund_user_ledger = FundUserLedger(
+                amount=amount,
+                timestamp=timestamp,
+                fund_user_id=fund_user.id
+            )
+            db.session.add(fund_user_ledger)
+            db.session.commit()
+
+            return redirect(url_for('loggedin_bp.fund_success', fund_id=fund_id))
+
 
     # notify of any form errors
     for error_type, error_messages in invest_fund_form.errors.items():
@@ -312,19 +373,35 @@ def fund(fund_id):
         Strategy.name.label('strategy_name'),
         Strategy.code.label('strategy_code'),
         Strategy.details.label('strategy_details'),
-        func.coalesce(func.count(FundUser.id), 0).label('fund_member_count')
     ).join(
         User,
         Fund.owner_id == User.id
     ).join(
         Strategy,
         Fund.strategy_id == Strategy.id
-    ).join(
-        FundUser,
-        FundUser.fund_id == Fund.id
     ).filter(
         Fund.id == fund_id
     ).first()
+
+    # see if user is member of fund
+    is_fund_member = db.session.query(
+        db.exists().where(
+            and_(
+                FundUser.user_id == current_user.id,
+                FundUser.fund_id == fund_id
+            )
+        )
+    ).scalar()
+
+    # see if user is owner of fund
+    is_fund_owner = db.session.query(
+        db.exists().where(
+            and_(
+                Fund.owner_id == current_user.id,
+                Fund.id == fund_id
+            )
+        )
+    ).scalar()
 
     # get investment amount of current user in this fund
     fund_user_investment = db.session.query(
@@ -347,7 +424,15 @@ def fund(fund_id):
         'dashboard-fund.html',
         title=f'Dashboard - {fund.fund_name} (#{fund.fund_id})',
         user=current_user,
-        form=invest_fund_form,
+        invest_form=invest_fund_form,
+        join_form=join_fund_form,
         fund=fund,
+        is_fund_member=is_fund_member,
+        is_fund_owner=is_fund_owner,
         fund_user_investment=fund_user_investment
     )
+
+@loggedin_bp.route('/dashboard/funds/<int:fund_id>/success', methods=['GET'])
+@login_required
+def fund_success(fund_id):
+    return redirect(url_for('loggedin_bp.fund', fund_id=fund_id))
