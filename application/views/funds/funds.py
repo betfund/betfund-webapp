@@ -124,7 +124,6 @@ def funds():
         Fund.name,
         Fund.description,
         Fund.timestamp,
-        Fund.owner_id,
     ).cte("fund_meta_cte")
     # finally combine all these common table expressions
     existing_funds = (
@@ -133,7 +132,6 @@ def funds():
             fund_meta_cte.c.name.label("name"),
             fund_meta_cte.c.description.label("description"),
             fund_meta_cte.c.timestamp.label("time_created"),
-            fund_meta_cte.c.owner_id.label("owner_id"),
             fund_member_count_cte.c.member_count.label("member_count"),
             func.coalesce(fund_capital_size_cte.c.capital_size, 0).label(
                 "capital_size"

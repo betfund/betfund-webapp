@@ -30,7 +30,6 @@
                     <th width="25%">Fund Name</th>
                     <th>Description</th>
                     <th width="15%">Time Created</th>
-                    <th width="5%">OwnerID</th>
                     <th width="10%">Member Count</th>
                     <th width="10%">Capital Size</th>
                 </tr>
@@ -42,7 +41,6 @@
                     <td><a href="{{ url_for('funds_bp.fund', fund_id=row.id) }}">{{ row.name }}</a></td>
                     <td>{{ row.description }}</td>
                     <td>{{ row.time_created | pretty_date }}</td>
-                    <td>{{ row.owner_id }}</td>
                     <td>{{ row.member_count }}</td>
                     <td>{{ "${:,.2f}".format(row.capital_size) }}</td>
                 </tr>

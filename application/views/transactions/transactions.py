@@ -20,7 +20,7 @@ def transactions():
     user_transactions = (
         db.session.query(UserLedger.id, UserLedger.timestamp, UserLedger.amount)
         .filter(UserLedger.user_id == current_user.id)
-        .order_by(UserLedger.timestamp.asc())
+        .order_by(UserLedger.id.asc())
         .all()
     )
 
@@ -36,7 +36,7 @@ def transactions():
         .join(User, FundUser.user_id == User.id)
         .join(Fund, FundUser.fund_id == Fund.id)
         .filter(User.id == current_user.id)
-        .order_by(FundUserLedger.timestamp.asc())
+        .order_by(FundUserLedger.id.asc())
         .all()
     )
 
