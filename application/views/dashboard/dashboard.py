@@ -84,7 +84,9 @@ def dashboard():
             Fund.id,
             Fund.name,
             Fund.description,
-            func.coalesce(fund_capital_size_cte.c.capital_size, 0).label("invested_size")
+            func.coalesce(fund_capital_size_cte.c.capital_size, 0).label(
+                "invested_size"
+            ),
         )
         .join(FundUser, FundUser.fund_id == Fund.id)
         .outerjoin(fund_capital_size_cte, fund_capital_size_cte.c.id == Fund.id)
@@ -99,7 +101,7 @@ def dashboard():
             Fund.id,
             Fund.name,
             Fund.description,
-            fund_capital_size_cte.c.capital_size.label("invested_size")
+            fund_capital_size_cte.c.capital_size.label("invested_size"),
         )
         .join(FundUser, FundUser.fund_id == Fund.id)
         .outerjoin(fund_capital_size_cte, fund_capital_size_cte.c.id == Fund.id)

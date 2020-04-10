@@ -120,10 +120,7 @@ def funds():
         .cte("fund_capital_size_cte")
     )
     fund_meta_cte = db.session.query(
-        Fund.id.label("fund_id"),
-        Fund.name,
-        Fund.description,
-        Fund.timestamp,
+        Fund.id.label("fund_id"), Fund.name, Fund.description, Fund.timestamp,
     ).cte("fund_meta_cte")
     # finally combine all these common table expressions
     existing_funds = (

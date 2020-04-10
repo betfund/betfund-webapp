@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from betfund_bet365 import Bet365SportId
 from flask_wtf import FlaskForm
 from wtforms import (
     DateTimeField,
@@ -31,17 +32,9 @@ class CreateFundForm(FlaskForm):
         widget=TextArea(),
     )
 
-    # replace this with betfund-bet365 enumeration later
     strategy_sports = SelectMultipleField(
         "Which sports will this fund invest in?",
-        choices=[
-            ("1", "National Football League"),
-            ("2", "National Basketball Association"),
-            ("3", "National Hockey League"),
-            ("4", "Major League Baseball"),
-            ("5", "Russian Premier League"),
-            ("6", "eSports"),
-        ],
+        choices=Bet365SportId.list(),
     )
 
     strategy_solicitation_schedule = SelectField(
