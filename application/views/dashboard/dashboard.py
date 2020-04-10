@@ -79,12 +79,12 @@ def dashboard():
     )
 
     # get funds user owns
-    funds_managed = (
+    funds_manage = (
         db.session.query(
             Fund.id,
             Fund.name,
             Fund.description,
-            fund_capital_size_cte.c.capital_size.label("invested_size")
+            func.coalesce(fund_capital_size_cte.c.capital_size, 0).label("invested_size")
         )
         .join(FundUser, FundUser.fund_id == Fund.id)
         .outerjoin(fund_capital_size_cte, fund_capital_size_cte.c.id == Fund.id)
@@ -113,7 +113,7 @@ def dashboard():
         title="Dashboard",
         user=current_user,
         form=deposit_form,
-        funds_managed=funds_managed,
+        funds_manage=funds_manage,
         funds_member=funds_member,
         available_balance=available_balance,
         invested_balance=invested_balance,

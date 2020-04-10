@@ -1,8 +1,8 @@
-"""initial database model
+"""creating fresh db
 
-Revision ID: 1310a3935ffe
+Revision ID: 0e82992def54
 Revises: 
-Create Date: 2020-04-02 02:15:53.705358
+Create Date: 2020-04-10 14:33:32.821057
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1310a3935ffe'
+revision = '0e82992def54'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -47,7 +47,10 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=256), nullable=False),
     sa.Column('description', sa.String(length=516), nullable=False),
+    sa.Column('timestamp', sa.DateTime(timezone=True), nullable=True),
     sa.Column('strategy_id', sa.Integer(), nullable=False),
+    sa.Column('owner_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['owner_id'], ['users.id'], name=op.f('fk_funds_owner_id_users')),
     sa.ForeignKeyConstraint(['strategy_id'], ['strategies.id'], name=op.f('fk_funds_strategy_id_strategies')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_funds'))
     )
