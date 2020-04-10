@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "nav-dashboard.html" %}
+{% include "dashboard-container-start.html" %}
+{% include "sidebar-dashboard.html" %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ fund.fund_name }} (ID: #{{ fund.fund_id }})</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            {% if is_fund_member %}
+            <div style="margin-right: 24px;">
+                <strong>Invested:</strong> {{ "${:,.2f}".format(fund_user_investment) }}
+                <br>
+                {% if is_fund_owner %}
+                <span class="text-success">You own this fund.</span>
+                {% else %}
+                <span class="text-success">You are a member.</span>
+                {% endif %}
+            </div>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#investModal">
+                Invest
+            </button>
+            {% else %}
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#joinModal">
+                Join!
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <p class="text-danger">{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <br>
+    <h2 class="lead">Information</h2>
+    <br>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <tbody>
+                <tr>
+                    <th width="20%">ID</th>
+                    <td>{{ fund.fund_id }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Name</th>
+                    <td>{{ fund.fund_name }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Description</th>
+                    <td>{{ fund.fund_description }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Owner Name</th>
+                    <td>{{ fund.owner_first_name }} {{ fund.owner_last_name }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Owner Email</th>
+                    <td>{{ fund.owner_email_address }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Strategy ID</th>
+                    <td>{{ fund.strategy_id }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Strategy Name</th>
+                    <td>{{ fund.strategy_name }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Strategy Code</th>
+                    <td>{{ fund.strategy_code }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Sports Focus</th>
+                    <td>
+                        <ul>
+                            {% for sport in fund.strategy_details['sports'] %}
+                            <li>{{ sport }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th width="20%">Solicitation Schedule</th>
+                    <td>{{ fund.strategy_details['solicitation_schedule'] }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Solicitation Start Time</th>
+                    <td>{{ fund.strategy_details['solicitation_start'] }}</td>
+                </tr>
+                {#
+                <tr>
+                    <th width="20%">Member Count</th>
+                    <td>{{ fund.fund_member_count }}</td>
+                </tr>
+                <tr>
+                    <th width="20%">Fund Value</th>
+                    <td>{{ "${:,.2f}".format(fund.fund_value) }}</td>
+                </tr>
+                #}
+            </tbody>
+        </table>
+    </div>
+</main>
+<!-- Modal -->
+<div class="modal fade" id="investModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Invest</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('funds_bp.fund', fund_id=fund.fund_id) }}" method="POST">
+                    {{ invest_form.csrf_token }}
+                    {{ invest_form.hidden_tag() }}
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="inputAmount">{{ invest_form.amount.label }}</label>
+                            {{ invest_form.amount(class='form-control', type="text", placeholder='Invest Amount', required=True, autofocus=True, autocomplete='off', id='inputAmount') }}
+                        </div>
+                    </div>
+                    {{ invest_form.invest(class='btn btn-primary') }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="joinModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Join</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('funds_bp.fund', fund_id=fund.fund_id) }}" method="POST">
+                    {{ join_form.csrf_token }}
+                    {{ join_form.hidden_tag() }}
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="inputAmount">{{ join_form.amount.label }}</label>
+                            {{ join_form.amount(class='form-control', type="text", placeholder='Invest Amount', required=True, autofocus=True, autocomplete='off', id='inputAmount') }}
+                        </div>
+                    </div>
+                    {{ join_form.join(class='btn btn-primary') }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% include "dashboard-container-end.html" %}
+{% include "footer-dashboard.html" %}
+{% endblock %}

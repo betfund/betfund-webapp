@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "nav-dashboard.html" %}
+{% include "dashboard-container-start.html" %}
+{% include "sidebar-dashboard.html" %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+        <h1 class="h2">Dashboard</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div style="margin-right: 24px;">
+                <strong>Available Balance:</strong> {{ "${:,.2f}".format(available_balance) }}
+                <br>
+                Invested: {{ "${:,.2f}".format(invested_balance) }}
+            </div>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                Deposit Money
+            </button>
+        </div>
+    </div>
+    <br>
+    <div>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <p class="text-danger">{{ message }}</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div>
+        <h5>Notifications</h5>
+        <p>This is where notifications will appear.</p>
+    </div>
+    <hr>
+    <div>
+        <h5>Managing</h5>
+        <p>This is where funds you manage will appear.</p>
+    </div>
+    <hr>
+    <div>
+        <h5>Invested</h5>
+        <p>This is where funds you belong to appear.</p>
+    </div>
+</main>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Deposit Money</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('dashboard_bp.dashboard') }}" method="POST">
+                    {{ form.csrf_token }}
+                    {{ form.hidden_tag() }}
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="inputEmail">{{ form.amount.label }}</label>
+                            {{ form.amount(class='form-control', type="float", placeholder='Amount', required=True, autofocus=True, autocomplete='off', id='inputAmount', min=0) }}
+                        </div>
+                    </div>
+                    {{ form.submit(class='btn btn-primary') }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% include "dashboard-container-end.html" %}
+{% include "footer-dashboard.html" %}
+{% endblock %}
