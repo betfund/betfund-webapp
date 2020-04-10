@@ -29,4 +29,4 @@ class TestConfig(Config):
     # Secret key for flask app
     SECRET_KEY = os.environ.get("SECRET_KEY", "fake-news")
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", f"sqlite:///{db_path}")
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = True

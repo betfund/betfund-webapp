@@ -31,15 +31,67 @@
         <h5>Notifications</h5>
         <p>This is where notifications will appear.</p>
     </div>
+    <br>
     <hr>
     <div>
         <h5>Managing</h5>
-        <p>This is where funds you manage will appear.</p>
+        <div class="table-responsive">
+            {% if funds_member|length > 0 %}
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th width="5%">FundID</th>
+                        <th width="25%">Fund Name</th>
+                        <th>Description</th>
+                        <th width="20%">Invested</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in funds_managed %}
+                    <tr>
+                        <td>{{ row.id }}</td>
+                        <td><a href="{{ url_for('funds_bp.fund', fund_id=row.id) }}">{{ row.name }}</a></td>
+                        <td>{{ row.description }}</td>
+                        <td>{{ "${:,.2f}".format(row.invested_size) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>You have not managing any funds. <a href="{{ url_for('funds_bp.funds') }}#createFundModal">Create a fund</a> to get started!</p>
+            {% endif %}
+        </div>
     </div>
+    <br>
     <hr>
     <div>
         <h5>Invested</h5>
-        <p>This is where funds you belong to appear.</p>
+        <div class="table-responsive">
+            {% if funds_member|length > 0 %}
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th width="5%">FundID</th>
+                        <th width="25%">Fund Name</th>
+                        <th>Description</th>
+                        <th width="20%">Invested</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in funds_member %}
+                    <tr>
+                        <td>{{ row.id }}</td>
+                        <td><a href="{{ url_for('funds_bp.fund', fund_id=row.id) }}">{{ row.name }}</a></td>
+                        <td>{{ row.description }}</td>
+                        <td>{{ "${:,.2f}".format(row.invested_size) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>You have not invested in any funds. <a href="{{ url_for('funds_bp.funds') }}">See funds</a> to explore some offerings!</p>
+            {% endif %}
+        </div>
     </div>
 </main>
 <!-- Modal -->

@@ -21,8 +21,8 @@ from application.views.funds.forms import CreateFundForm, InvestFundForm, JoinFu
 funds_bp = Blueprint("funds_bp", __name__, template_folder="templates")
 
 
-@funds_bp.app_template_filter('pretty_date')
-def pretty_date(date, fmt='%b %d, %Y'):
+@funds_bp.app_template_filter("pretty_date")
+def pretty_date(date, fmt="%b %d, %Y"):
     """Converts a date to pretty format.
 
     Parameters
@@ -38,7 +38,7 @@ def pretty_date(date, fmt='%b %d, %Y'):
         Formatted datetime object as string.
     """
     if not date:
-        return '-'
+        return "-"
     return date.strftime(fmt)
 
 
@@ -135,7 +135,9 @@ def funds():
             fund_meta_cte.c.timestamp.label("time_created"),
             fund_meta_cte.c.owner_id.label("owner_id"),
             fund_member_count_cte.c.member_count.label("member_count"),
-            func.coalesce(fund_capital_size_cte.c.capital_size, 0).label("capital_size"),
+            func.coalesce(fund_capital_size_cte.c.capital_size, 0).label(
+                "capital_size"
+            ),
         )
         .join(
             fund_member_count_cte,
