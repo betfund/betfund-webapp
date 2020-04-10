@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "nav-default.html" %}
+<div class="container">
+    <br>
+    <h1 class="h3 mb-3 font-weight-normal">Sign up</h1>
+    <br>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <p class="text-danger">{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('signup_bp.signup') }}" method="POST">
+        {{ form.csrf_token }}
+        {{ form.hidden_tag() }}
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="inputFirstName">{{ form.first_name.label }}</label>
+                {{ form.first_name(class='form-control', type="text", placeholder='First name', required=True, autofocus=True, autocomplete='off', id='inputFirstName') }}
+            </div>
+            <div class="form-group col-md-6">
+                <label for="inputLastName">{{ form.last_name.label }}</label>
+                {{ form.last_name(class='form-control', type="text", placeholder='Last name', required=True, autocomplete='off', id='inputFirstName') }}
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputEmail">{{ form.email_address.label }}</label>
+            {{ form.email_address(class='form-control', type="email", placeholder='Email address', required=True, autocomplete='off', id='inputEmail') }}
+        </div>
+        <div class="form-group">
+            <label for="inputPassword">{{ form.password.label }}</label>
+            {{ form.password(class='form-control', type="password", placeholder='Password', required=True, autocomplete='off', id='inputPassword') }}
+        </div>
+        <div class="form-group">
+            <label for="inputPassword2">{{ form.password_check.label }}</label>
+            {{ form.password_check(class='form-control', type="password", placeholder='Password again', autocomplete='off', required=True, id='inputPassword2') }}
+        </div>
+        {{ form.submit(class='btn btn-primary') }}
+        -
+    </form>
+</div>
+<br>
+<br>
+<br>
+{% include "footer-default.html" %}
+{% endblock %}

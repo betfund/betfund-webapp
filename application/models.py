@@ -60,7 +60,7 @@ class User(db.Model, UserMixin):
         """
         Check if user is verified.
         """
-        return self.role == 'admin' or self.role == 'user'
+        return self.role == "admin" or self.role == "user"
 
     @property
     def is_new(self):
@@ -74,7 +74,7 @@ class User(db.Model, UserMixin):
         """
         Check if verified user.
         """
-        return self.role == 'user'
+        return self.role == "user"
 
     def __repr__(self):
         return f"<User `{self.id}`>"
@@ -104,7 +104,7 @@ class UserLedger(db.Model):
 
     # relationships
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    user = db.relationship('User', backref=db.backref('userledger', lazy='dynamic'))
+    user = db.relationship("User", backref=db.backref("userledger", lazy="dynamic"))
 
     def __repr__(self):
         return f"<UserLedger `{self.id}`>"
@@ -130,16 +130,16 @@ class FundUser(db.Model):
 
     __tablename__ = "fund_users"
     __table_args__ = (
-        db.UniqueConstraint('fund_id', 'user_id', name='unique_idx_fund_id_user_id'),
+        db.UniqueConstraint("fund_id", "user_id", name="unique_idx_fund_id_user_id"),
     )
 
     id = db.Column(db.Integer, primary_key=True)
 
     # relationships
     fund_id = db.Column(db.Integer, db.ForeignKey("funds.id"), nullable=False)
-    fund = db.relationship('Fund', backref=db.backref('funduser', lazy='dynamic'))
+    fund = db.relationship("Fund", backref=db.backref("funduser", lazy="dynamic"))
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    user = db.relationship('User', backref=db.backref('funduser', lazy='dynamic'))
+    user = db.relationship("User", backref=db.backref("funduser", lazy="dynamic"))
 
     def __repr__(self):
         return f"<FundUser `{self.id}`>"
@@ -227,7 +227,9 @@ class FundUserLedger(db.Model):
 
     # relationships
     fund_user_id = db.Column(db.Integer, db.ForeignKey("fund_users.id"), nullable=False)
-    fund_user = db.relationship('FundUser', backref=db.backref('funduserledger', lazy='dynamic'))
+    fund_user = db.relationship(
+        "FundUser", backref=db.backref("funduserledger", lazy="dynamic")
+    )
 
     def __repr__(self):
         return f"<FundUserLedger `{self.id}`>"
@@ -257,7 +259,7 @@ class FundLedger(db.Model):
 
     # relationships
     fund_id = db.Column(db.Integer, db.ForeignKey("funds.id"), nullable=False)
-    fund = db.relationship('Fund', backref=db.backref('fundledger', lazy='dynamic'))
+    fund = db.relationship("Fund", backref=db.backref("fundledger", lazy="dynamic"))
 
     def __repr__(self):
         return f"<FundLedger `{self.id}`>"
@@ -283,9 +285,9 @@ class Fund(db.Model):
 
     # relationships
     strategy_id = db.Column(db.Integer, db.ForeignKey("strategies.id"), nullable=False)
-    strategy = db.relationship('Strategy', backref=db.backref('fund', lazy='dynamic'))
+    strategy = db.relationship("Strategy", backref=db.backref("fund", lazy="dynamic"))
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    owner = db.relationship('User', backref=db.backref('fund', lazy='dynamic'))
+    owner = db.relationship("User", backref=db.backref("fund", lazy="dynamic"))
 
     def __repr__(self):
         return f"<Fund `{self.id}`>"
@@ -399,7 +401,9 @@ class Result(db.Model):
     is_win = db.Column(db.Boolean, nullable=False)
 
     # relationships
-    investment_id = db.Column(db.Integer, db.ForeignKey("investments.id"), nullable=False)
+    investment_id = db.Column(
+        db.Integer, db.ForeignKey("investments.id"), nullable=False
+    )
 
     def __repr__(self):
         return f"<Result `{self.id}`>"

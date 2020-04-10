@@ -8,7 +8,7 @@ class Config:
     DEBUG = False
     TESTING = False
 
-    FLASK_ADMIN_SWATCH = 'cyborg'
+    FLASK_ADMIN_SWATCH = "cyborg"
 
 
 class ProductionConfig(Config):
@@ -22,11 +22,11 @@ class TestConfig(Config):
     TESTING = True
 
     # get test database default
-    db_dir = TOP_DIR.parent / '..' / 'tests' / 'database'
+    db_dir = TOP_DIR.parent / ".." / "tests" / "database"
     db_dir.mkdir(parents=True, exist_ok=True)
-    db_path = str(db_dir / 'test.db')
+    db_path = str(db_dir / "test.db")
 
     # Secret key for flask app
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'fake-news')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', f'sqlite:///{db_path}')
+    SECRET_KEY = os.environ.get("SECRET_KEY", "fake-news")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", f"sqlite:///{db_path}")
     SQLALCHEMY_TRACK_MODIFICATIONS = False

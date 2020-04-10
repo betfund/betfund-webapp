@@ -15,20 +15,20 @@ from werkzeug.utils import import_string
 config_dict = {
     "production": "application.config.ProductionConfig",
     "testing": "application.config.TestConfig",
-    "default": "application.config.TestConfig"
+    "default": "application.config.TestConfig",
 }
 
 # Database index naming conventions
 naming_convention = {
-    "ix": 'ix_%(column_0_label)s',
+    "ix": "ix_%(column_0_label)s",
     "uq": "uq_%(table_name)s_%(column_0_name)s",
     "ck": "ck_%(table_name)s_%(column_0_name)s",
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-    "pk": "pk_%(table_name)s"
+    "pk": "pk_%(table_name)s",
 }
 
 # Set globals
-admininstrator = Admin(name='Betfund')
+admininstrator = Admin(name="Betfund")
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 login_manager = LoginManager()
 mail = Mail()
@@ -42,7 +42,7 @@ def create_app(test_config=True):
     app = Flask(__name__, instance_relative_config=False)
 
     # Get the appropriate configuration, and instantiate it
-    config_name = os.getenv('FLASK_CONFIGURATION', 'default')
+    config_name = os.getenv("FLASK_CONFIGURATION", "default")
     config = import_string(config_dict[config_name])()
     app.config.from_object(config)
 
@@ -70,27 +70,31 @@ def create_app(test_config=True):
         # Register the the Blueprints
 
         # Home page
-        from application.home.home_routes import home_bp
-        app.register_blueprint(home_bp, url_prefix='/')
-
-        # Main dashboard/newsfeed page
-        from application.loggedin.loggedin_routes import loggedin_bp
-        app.register_blueprint(loggedin_bp)
+        from application.views.home import home_bp
+        app.register_blueprint(home_bp, url_prefix="/")
 
         # Login page
-        from application.login.login_routes import login_bp
+        from application.views.auth import login_bp
         app.register_blueprint(login_bp)
 
         # Signup page
-        from application.signup.signup_routes import signup_bp
+        from application.views.auth import signup_bp
         app.register_blueprint(signup_bp)
 
-        # Survey page
-        from application.surveys.survey_routes import survey_bp
-        app.register_blueprint(survey_bp)
+        # Dashboard page
+        from application.views.dashboard import dashboard_bp
+        app.register_blueprint(dashboard_bp)
+
+        # Funds page
+        from application.views.funds import funds_bp
+        app.register_blueprint(funds_bp)
+
+        # Transactions page
+        from application.views.transactions import transactions_bp
+        app.register_blueprint(transactions_bp)
 
         # Import the Admin views
-        from application.admin.admin_routes import add_admin_views
+        from application.views.admin import add_admin_views
         add_admin_views(admininstrator)
-    
+
     return app
