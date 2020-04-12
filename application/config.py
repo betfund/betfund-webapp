@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 TOP_DIR = Path(__file__)
@@ -26,7 +27,12 @@ class TestConfig(Config):
     db_dir.mkdir(parents=True, exist_ok=True)
     db_path = str(db_dir / "test.db")
 
-    # Secret key for flask app
+    # secret key for flask app
     SECRET_KEY = os.environ.get("SECRET_KEY", "fake-news")
+
+    # sqlalchemy configs
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", f"sqlite:///{db_path}")
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+
+    # flask session configuration
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=1)

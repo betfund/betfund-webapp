@@ -70,37 +70,30 @@ def create_app(test_config=True):
         ## Register the the Blueprints
         # Home page
         from application.views.home import home_bp
-
         app.register_blueprint(home_bp, url_prefix="/")
 
         # Login page
         from application.views.auth import login_bp
-
         app.register_blueprint(login_bp)
 
         # Signup page
         from application.views.auth import signup_bp
-
         app.register_blueprint(signup_bp)
 
         # Dashboard page
         from application.views.dashboard import dashboard_bp
-
         app.register_blueprint(dashboard_bp)
 
         # Funds page
         from application.views.funds import funds_bp
-
         app.register_blueprint(funds_bp)
 
         # Transactions page
         from application.views.transactions import transactions_bp
-
         app.register_blueprint(transactions_bp)
 
         # Import the Admin views
         from application.views.admin import add_admin_views
-
         add_admin_views(admininstrator)
 
     return app

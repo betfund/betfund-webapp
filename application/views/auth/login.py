@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
 from application.views.auth import LoginForm
@@ -40,6 +40,7 @@ def login():
             # redirect them to the dashboard
             if user and user.check_password(password=password):
                 login_user(user)
+                session.permanent = True
                 return redirect(url_for("dashboard_bp.dashboard"))
 
         # otherwise, tell them the password is invalid
